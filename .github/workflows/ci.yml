@@ -47,7 +47,8 @@ jobs:
     with:
       build_profile: ${{ needs.strategy.outputs.profile }}
 
-  # Call Sage3 Windows Build
+  # Call Sage3 Windows Build (DISABLED - see workflow file for details)
+  # Blackwell sm_100a has toolchain issues on Windows/MSVC
   build-sage3-windows:
     needs: strategy
     uses: ./.github/workflows/build-sageattn3-windows.yml
@@ -144,7 +145,7 @@ jobs:
             | OS | Python | PyTorch | CUDA |
             |----|--------|---------|------|
             | 🐧 Linux | 3.12 | 2.9.0 | 12.8, 12.9, 13.0, 13.1 |
-            | 🪟 Windows | 3.12 | 2.9.0 | 12.8, 12.9, 13.0, 13.1 |
+            | 🪟 Windows | ❌ Not supported (sm_100a toolchain issues) |
 
             ### 💻 Installation
             

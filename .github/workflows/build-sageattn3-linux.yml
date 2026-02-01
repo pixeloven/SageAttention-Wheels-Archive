@@ -120,7 +120,7 @@ jobs:
           # Pattern: 12.8.0 -> 12.8 -> 128
           cuda_tag=$(echo "${{ matrix.cuda }}" | cut -d. -f1,2 | tr -d '.')
           
-          export SAGEATTENTION_WHEEL_VERSION_SUFFIX="+cu${cuda_tag}torch${{ matrix.pytorch }}"
+          export SAGEATTENTION_BUILD_TAG="${torch_tag}.${cuda_tag}"
           export TORCH_CUDA_ARCH_LIST="${{ matrix.arch_list }}"
           export MAX_JOBS="1"
           
@@ -131,7 +131,7 @@ jobs:
           export TORCH_CPP_LOG_LEVEL=INFO
           export DISTUTILS_DEBUG=1
           
-          python setup.py bdist_wheel --verbose
+          python setup.py bdist_wheel --verbose --build-number "$SAGEATTENTION_BUILD_TAG"
           
       - name: Verify wheel naming
         working-directory: ./sageattention3_blackwell
@@ -143,7 +143,7 @@ jobs:
           # Basic pattern check
           for wheel in dist/*.whl; do
             filename=$(basename "$wheel")
-            if [[ ! $filename =~ ^sageattn3-1\.0\.0\+cu[0-9]+torch[0-9]+\.[0-9]+\.[0-9]+-cp[0-9]+-cp[0-9]+-linux_x86_64\.whl$ ]]; then
+            if [[ ! $filename =~ ^sageattention-3\.0\.0-[0-9]+\.[0-9]+-cp[0-9]+-cp[0-9]+-linux_x86_64\.whl$ ]]; then
               echo "❌ Wheel name warning: $filename"
             else
               echo "✅ Wheel name looks correct: $filename"

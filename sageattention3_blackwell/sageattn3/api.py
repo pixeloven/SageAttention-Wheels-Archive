@@ -19,9 +19,8 @@ import triton.language as tl
 import torch.nn.functional as F
 from typing import Tuple
 from torch.nn.functional import scaled_dot_product_attention as sdpa
-
-from . import fp4attn_cuda
-from . import fp4quant_cuda
+import fp4attn_cuda
+import fp4quant_cuda
 
 
 @triton.jit

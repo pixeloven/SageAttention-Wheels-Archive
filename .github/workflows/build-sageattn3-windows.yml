@@ -1,4 +1,25 @@
-name: Build SageAttention3 Wheels (Windows)
+# =============================================================================
+# DISABLED: SageAttention3 Windows builds are not currently supported
+# =============================================================================
+#
+# The Blackwell (sm_100a) architecture has compilation issues on Windows:
+#
+# 1. C++20 Feature Usage: The code uses C++20 structured binding captures
+#    (mainloop_tma_ws.h:478) but builds with -std=c++17. This works on
+#    Linux/GCC as an extension but fails on Windows/MSVC.
+#
+# 2. CUDA Toolchain: CUDA 12.8 with MSVC may have incomplete sm_100a support,
+#    causing internal compiler errors (exit code -1/4294967295).
+#
+# To re-enable Windows builds in the future, try:
+#   - Upgrade to C++20: Change -std=c++17 to -std=c++20 in setup.py
+#   - Upgrade CUDA: Try CUDA 12.9+ which may have better Windows sm_100 support
+#   - Check NVIDIA docs for Windows Blackwell toolchain requirements
+#
+# See: https://github.com/pixeloven/SageAttention/issues/XXX (if applicable)
+# =============================================================================
+
+name: Build SageAttention3 Wheels (Windows) [DISABLED]
 
 on:
   workflow_call:
@@ -19,136 +40,41 @@ on:
           - stable      # All builds
 
 jobs:
-  # Job 1: Generate build matrix
-  generate-matrix:
+  # This job always runs to provide a status check, but skips actual builds
+  disabled-notice:
     runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.generate.outputs.matrix }}
     steps:
-      - uses: actions/checkout@v4
-      - id: generate
-        uses: ./.github/actions/generate-matrix
-        with:
-          build_profile: ${{ inputs.build_profile }}
-          os: 'windows'
-          project: 'sage3'
-
-  # Job 2: Build wheels on Windows
-  build-wheels:
-    name: Build ${{ matrix.display }}
-    needs: [generate-matrix]
-    runs-on: windows-latest
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive # REQUIRED for cutlass
-
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python }}
-
-      - name: Install CUDA Toolkit
-        uses: Jimver/cuda-toolkit@v0.2.30
-        with:
-          cuda: ${{ matrix.cuda }}
-          log-file-suffix: "log-windows-sage3-py${{ matrix.python }}-torch${{ matrix.pytorch }}-cuda${{ matrix.cuda }}.txt"
-
-      - name: Setup MSVC
-        uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: x64
-
-      - name: Configure git for line endings
+      - name: Windows builds disabled
         run: |
-          git config --global core.autocrlf false
-          git config --global core.eol lf
+          echo "::warning::SageAttention3 Windows builds are currently disabled due to Blackwell (sm_100a) toolchain incompatibilities with MSVC."
+          echo ""
+          echo "To re-enable, see comments at the top of this workflow file."
+          echo ""
+          echo "Possible fixes:"
+          echo "  1. Upgrade to C++20 (-std=c++20 in setup.py)"
+          echo "  2. Upgrade to CUDA 12.9+ for better Windows sm_100 support"
+          echo "  3. Wait for NVIDIA to improve Windows Blackwell toolchain"
 
-      - name: Upgrade pip and install build tools
-        run: |
-          python -m pip install --upgrade pip setuptools wheel packaging
-
-      - name: Install PyTorch
-        shell: bash
-        run: |
-          cuda_version="${{ matrix.cuda }}"
-          pytorch_version="${{ matrix.pytorch }}"
-
-          if [[ "$cuda_version" =~ ^12\.[89] ]] || [[ "$cuda_version" =~ ^13\. ]]; then
-             index_url="https://download.pytorch.org/whl/cu128"
-          else
-             index_url="https://download.pytorch.org/whl/cu121"
-          fi
-          
-          pip install torch==$pytorch_version torchvision --index-url "$index_url"
-
-      - name: Install build dependencies
-        run: |
-          pip install numpy packaging pybind11
-
-      - name: Build wheel (Sage3)
-        working-directory: ./sageattention3_blackwell
-        shell: powershell
-        run: |
-          # Extract version components for build tags
-          $pytorch = "${{ matrix.pytorch }}"
-          $cuda = "${{ matrix.cuda }}"
-          
-          # Pattern: 12.8.0 -> 12.8 -> 128
-          $cuda_parts = $cuda.Split('.')
-          $cuda_tag = $cuda_parts[0] + $cuda_parts[1]
-          
-          $env:SAGEATTENTION_WHEEL_VERSION_SUFFIX = "+cu" + $cuda_tag + "torch" + $pytorch
-          $env:TORCH_CUDA_ARCH_LIST = "${{ matrix.arch_list }}"
-          $env:DISTUTILS_USE_SDK = "1"
-          $env:MAX_JOBS = "1"
-          
-          python setup.py bdist_wheel
-
-      - name: Verify wheel naming
-        working-directory: ./sageattention3_blackwell
-        shell: bash
-        run: |
-          echo "=== Built wheels ==="
-          ls -lh dist/
-
-          for wheel in dist/*.whl; do
-            filename=$(basename "$wheel")
-            echo "Checking wheel: $filename"
-            
-            # Pattern: sageattn3-1.0.0+cu128torch2.9.0-cp312-cp312-win_amd64.whl
-            if [[ ! $filename =~ ^sageattn3-1\.0\.0\+cu[0-9]+torch[0-9]+\.[0-9]+\.[0-9]+-cp[0-9]+-cp[0-9]+-win_amd64\.whl$ ]]; then
-              echo "❌ Wheel name warning: $filename"
-            else
-              echo "✅ Wheel name looks correct: $filename"
-            fi
-          done
-
-      - name: Upload wheel artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: wheel-windows-sage3-py${{ matrix.python }}-torch${{ matrix.pytorch }}-cuda${{ matrix.cuda }}
-          path: ./sageattention3_blackwell/dist/*.whl
-          retention-days: 7
-          compression-level: 0
-
-      - name: Test wheel installation
-        working-directory: ./sageattention3_blackwell
-        shell: bash
-        run: |
-          cuda_version="${{ matrix.cuda }}"
-          if [[ "$cuda_version" =~ ^12\.[89] ]] || [[ "$cuda_version" =~ ^13\. ]]; then
-             index_url="https://download.pytorch.org/whl/cu128"
-          else
-             index_url="https://download.pytorch.org/whl/cu121"
-          fi
-          
-          wheel=$(ls dist/*.whl | head -n 1)
-          
-          echo "Installing $wheel with index $index_url"
-          pip install "$wheel" --index-url "$index_url"
+  # Original build jobs commented out - uncomment when Windows support is ready
+  # generate-matrix:
+  #   runs-on: ubuntu-latest
+  #   outputs:
+  #     matrix: ${{ steps.generate.outputs.matrix }}
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - id: generate
+  #       uses: ./.github/actions/generate-matrix
+  #       with:
+  #         build_profile: ${{ inputs.build_profile }}
+  #         os: 'windows'
+  #         project: 'sage3'
+  #
+  # build-wheels:
+  #   name: Build ${{ matrix.display }}
+  #   needs: [generate-matrix]
+  #   runs-on: windows-latest
+  #   strategy:
+  #     fail-fast: false
+  #     matrix: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
+  #   steps:
+  #     ... (original build steps)
