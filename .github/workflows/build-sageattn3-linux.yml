@@ -143,7 +143,7 @@ jobs:
           # Basic pattern check
           for wheel in dist/*.whl; do
             filename=$(basename "$wheel")
-            if [[ ! $filename =~ ^sageattention-3\.0\.0-[0-9]+\.[0-9]+-cp[0-9]+-cp[0-9]+-linux_x86_64\.whl$ ]]; then
+            if [[ ! $filename =~ ^sageattn3-1\.0\.0-[0-9]+\.[0-9]+-cp[0-9]+-cp[0-9]+-linux_x86_64\.whl$ ]]; then
               echo "❌ Wheel name warning: $filename"
             else
               echo "✅ Wheel name looks correct: $filename"

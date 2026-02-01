@@ -154,9 +154,9 @@ jobs:
             pip install https://github.com/${{ github.repository }}/releases/download/${{ steps.generate_tag.outputs.tag }}/sageattention-2.2.0-290.128-cp312-cp312-linux_x86_64.whl
             ```
             
-            **SageAttn3 (Blackwell):**
+            **SageAttn3 (Blackwell, Linux only):**
             ```bash
-            pip install https://github.com/${{ github.repository }}/releases/download/${{ steps.generate_tag.outputs.tag }}/sageattn3-1.0.0+cu128torch2.9.0-cp312-cp312-linux_x86_64.whl
+            pip install https://github.com/${{ github.repository }}/releases/download/${{ steps.generate_tag.outputs.tag }}/sageattn3-1.0.0-290.128-cp312-cp312-linux_x86_64.whl
             ```
             
             _Select the appropriate wheel for your PyTorch version from the Assets section below._

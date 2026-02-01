@@ -11,8 +11,8 @@ requires = [
 ]
 
 [project]
-name = "sageattention"
-version = "3.0.0"
+name = "sageattn3"
+version = "1.0.0"
 description = "Accurate and efficient plug-and-play low-bit attention for Blackwell schemas."
 readme = "README.md"
 license = "Apache-2.0"

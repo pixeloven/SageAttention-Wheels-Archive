@@ -16,7 +16,6 @@
 #   - Upgrade CUDA: Try CUDA 12.9+ which may have better Windows sm_100 support
 #   - Check NVIDIA docs for Windows Blackwell toolchain requirements
 #
-# See: https://github.com/pixeloven/SageAttention/issues/XXX (if applicable)
 # =============================================================================
 
 name: Build SageAttention3 Wheels (Windows) [DISABLED]
@@ -54,27 +53,3 @@ jobs:
           echo "  1. Upgrade to C++20 (-std=c++20 in setup.py)"
           echo "  2. Upgrade to CUDA 12.9+ for better Windows sm_100 support"
           echo "  3. Wait for NVIDIA to improve Windows Blackwell toolchain"
-
-  # Original build jobs commented out - uncomment when Windows support is ready
-  # generate-matrix:
-  #   runs-on: ubuntu-latest
-  #   outputs:
-  #     matrix: ${{ steps.generate.outputs.matrix }}
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - id: generate
-  #       uses: ./.github/actions/generate-matrix
-  #       with:
-  #         build_profile: ${{ inputs.build_profile }}
-  #         os: 'windows'
-  #         project: 'sage3'
-  #
-  # build-wheels:
-  #   name: Build ${{ matrix.display }}
-  #   needs: [generate-matrix]
-  #   runs-on: windows-latest
-  #   strategy:
-  #     fail-fast: false
-  #     matrix: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
-  #   steps:
-  #     ... (original build steps)
