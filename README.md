@@ -1,5 +1,8 @@
 > **Note:** This is a fork with minimal changes to the original project, focused on providing a seamless installation experience. Our emphasis is on facilitating the use of pre-compiled wheels—available for both Windows and Linux in the Releases section—and providing an easy-to-use Docker compilation process for local Linux builds. For development guides, wheel compatibility, and build instructions, please see  [CONTRIBUTING.md](CONTRIBUTING.md).
 
+[![GitHub Sponsors](https://img.shields.io/github/sponsors/pixeloven?style=for-the-badge&logo=github&label=Sponsor)](https://github.com/sponsors/pixeloven)
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-support-yellow?style=for-the-badge&logo=buymeacoffee)](https://buymeacoffee.com/pixeloven)
+
 # SageAttention
 <!-- We are continuously updating more features. You could **Star** and **Watch** our repository to stay updated.
 

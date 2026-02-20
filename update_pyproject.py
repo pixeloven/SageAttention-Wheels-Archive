@@ -18,15 +18,17 @@ def main():
     with open(target_file, "r") as f:
         text = f.read()
 
-    # If TORCH_VERSION is provided (e.g. 2.9.0), use it to determine bounds
+    # If TORCH_VERSION is provided (e.g. 2.9.0), use it to set a lower bound
     if os.getenv("TORCH_VERSION"):
         torch_ver = os.getenv("TORCH_VERSION")
-        # Assuming semantic versioning: 2.9.0 -> >=2.9.0, <2.10.0
+        # Only set a lower bound; the build tag in the wheel filename already
+        # communicates which PyTorch version the wheel was built against.
+        # An upper bound causes pip to downgrade torch in environments with
+        # a newer compatible version installed.
         parts = torch_ver.split('.')
         if len(parts) >= 2:
             major, minor = parts[0], parts[1]
-            next_minor = int(minor) + 1
-            new_spec = f'"torch>={major}.{minor}.0,<{major}.{next_minor}.0"'
+            new_spec = f'"torch>={major}.{minor}.0"'
 
             # Pattern to match any torch dependency with or without version specifiers
             # Matches: "torch", "torch>=2.8.0,<2.9.0", "torch>=2.9.0", etc.
