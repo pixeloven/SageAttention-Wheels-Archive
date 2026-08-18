@@ -1,4 +1,18 @@
-> **Note:** This is a fork with minimal changes to the original project, focused on providing a seamless installation experience. Our emphasis is on facilitating the use of pre-compiled wheels—available for both Windows and Linux in the Releases section—and providing an easy-to-use Docker compilation process for local Linux builds. For development guides, wheel compatibility, and build instructions, please see  [CONTRIBUTING.md](CONTRIBUTING.md).
+> [!IMPORTANT]
+> **This repository is an archived snapshot of PixelOven's original
+> SageAttention wheel work.** Active binary packaging has moved to
+> [`pixeloven/SageAttention-Wheels`](https://github.com/pixeloven/SageAttention-Wheels),
+> where wheels are built from pinned commits in the canonical
+> [`thu-ml/SageAttention`](https://github.com/thu-ml/SageAttention) project.
+> We separated wheel production from the source fork so that
+> [`pixeloven/SageAttention`](https://github.com/pixeloven/SageAttention) can
+> track the canonical project directly. Releases in this archive are retained
+> for historical compatibility but will not receive new build matrices.
+
+For the current build process, supported compatibility tuples, and new binary
+releases, use the
+[`SageAttention-Wheels`](https://github.com/pixeloven/SageAttention-Wheels)
+project.
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/pixeloven?style=for-the-badge&logo=github&label=Sponsor)](https://github.com/sponsors/pixeloven)
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-support-yellow?style=for-the-badge&logo=buymeacoffee)](https://buymeacoffee.com/pixeloven)
