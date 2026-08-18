@@ -27,7 +27,7 @@ SageAttention/
 
 ### Build Tools & Goals
 *   **Docker (`docker-bake.hcl`)**: We use Docker Buildx Bake to orchestrate complex multi-platform builds. This ensures that our build environment is consistent and reproducible, regardless of the host machine.
-*   **CI/CD (`.github/workflows`)**: Our GitHub Actions pipeline handles linting, testing, and wheel generation. It automates the release process, ensuring that every tag results in a verified set of artifacts.
+*   **CI/CD (`.github/workflows`)**: GitHub Actions workflows build and verify wheels. Because this repository is an archive (see the README), they no longer run automatically for repository changes — trigger `ci.yml` manually via `workflow_dispatch`, which publishes a GitHub Release only when its `publish_release` input is set.
 *   **Dual-Version Support**: The repository houses both the standard `sageattention` and the next-gen `sageattention3_blackwell` for optimized performance on newer hardware.
 
 This guide details the enhancements made in this fork, specifically regarding **Docker-based builds**, **CI/CD standards** and **Pre-built wheels**.
@@ -51,12 +51,12 @@ docker buildx bake linux
 You can run the CI workflows locally using [`act`](https://nektosact.com/installation/index.html) (requires Docker):
 ```bash
 # Run the Linux wheel build workflow
-gh act -W .github/workflows/build-wheels-linux.yml --container-architecture linux/amd64
+gh act -W .github/workflows/build-sageattn2-linux.yml --container-architecture linux/amd64
 ```
 
 ## 📦 Releases
 
-We provide pre-built wheels for Linux and Windows for the following configurations:
+Existing releases in this archive include pre-built wheels for Linux and Windows for the following configurations (new wheels are published from [`pixeloven/SageAttention-Wheels`](https://github.com/pixeloven/SageAttention-Wheels) — see the README):
 
 | PyTorch | CUDA | Python | Platform |
 | :---: | :---: | :---: | :---: |
@@ -72,7 +72,7 @@ We enforce specific build tags to ensure wheels are strictly PEP 440 compliant w
     *   Format: `{torch_major}{torch_minor}{torch_patch}.{cuda_major}{cuda_minor}`.
 
 ### CI/CD Implementation
-Our release process is automated via GitHub Actions, which orchestrates the build and verification of these artifacts.
-*   **`build-wheels-linux.yml`**: Uses `setup-python` and native runners for speed.
-*   **`build-wheels-windows.yml`**: Uses MSVC runners.
-*   **Verification**: Both workflows verify the generated wheels by installing them and running a basic import check.
+Builds run only when `ci.yml` is dispatched manually; its release job publishes the built wheels as a GitHub Release only when the `publish_release` input is set.
+*   **`build-sageattn2-linux.yml` / `build-sageattn3-linux.yml`**: Use `setup-python` and native Linux runners.
+*   **`build-sageattn2-windows.yml` / `build-sageattn3-windows.yml`**: Use MSVC runners.
+*   **Verification**: The build jobs verify generated wheels by installing them and running a basic import check.
