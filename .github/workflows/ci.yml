@@ -4,12 +4,17 @@ on:
   # This repository is retained as a historical archive. Legacy wheel builds
   # remain available on demand, but no longer run for repository changes.
   workflow_dispatch:
+    inputs:
+      publish_release:
+        description: Publish a GitHub Release with the built wheels
+        type: boolean
+        default: false
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  # Determine which profile to run based on event type
+  # Archive builds always use the full 'stable' profile
   strategy:
     runs-on: ubuntu-latest
     outputs:
@@ -17,13 +22,8 @@ jobs:
     steps:
       - id: profile
         run: |
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            echo "profile=default" >> $GITHUB_OUTPUT
-            echo "Event is PR: Using 'default' profile (fast build)"
-          else
-            echo "profile=stable" >> $GITHUB_OUTPUT
-            echo "Event is Push to Main: Using 'stable' profile (full build)"
-          fi
+          echo "profile=stable" >> $GITHUB_OUTPUT
+          echo "Manual archive build: using 'stable' profile (full build)"
 
   # Call Sage2 Linux Build
   build-sage2-linux:
@@ -54,11 +54,13 @@ jobs:
     with:
       build_profile: ${{ needs.strategy.outputs.profile }}
 
-  # Release Job (Only on push to main)
+  # Release Job (only when explicitly requested via the publish_release input)
   release:
     needs: [build-sage2-linux, build-sage2-windows, build-sage3-linux, build-sage3-windows]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: inputs.publish_release
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
