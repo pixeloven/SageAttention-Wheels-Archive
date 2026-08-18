@@ -1,10 +1,9 @@
 name: CI
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+  # This repository is retained as a historical archive. Legacy wheel builds
+  # remain available on demand, but no longer run for repository changes.
+  workflow_dispatch:
 
 permissions:
   contents: write
